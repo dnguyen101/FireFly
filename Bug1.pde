@@ -2,7 +2,7 @@ class Bug1 {
 
     float xPos = random(width);
     float yPos = 0;
-    float speedY = .5;
+    float speedY = .1;
     float gravity = 0.1;
     float w = 50;
     

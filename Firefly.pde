@@ -1,21 +1,32 @@
 import processing.sound.*;
-SoundFile file;
+SoundFile menuMusic,StageMusic,beastiaryMusic, music;
 
-PImage img;
 
-boolean mainMenu = true; //Main menu activation
+
+
+//For Main Menu
+boolean mainMenu = false; //Main menu activation
 boolean movetolvl =false;
 boolean stageload = false ; 
 boolean bestiary = false; 
-int timer;
+boolean gameover = false; 
+int gametimer, countUp, timerStart, timeRem, spawntimer;
+PImage img;
+String scoreText;
 
 
+//For beastiary
+PImage tearsImg, mushroomsImg, spiderImg;
+int beastScore;
+boolean beastBG = false;
+Mushroom mushroom;
+knight knight;
 
-
-
+//For Game Stages
 int stageLVL = 0;
 int interval;
 int score;
+
 
 
 float c1x = 0;      // circle 1 position
@@ -28,18 +39,27 @@ ArrayList < Bug1 > Bug1s;
 
 void setup()
 {
+  mainMenu=true;
   background(0);
   size(1280, 720);  
   img = loadImage("BroodingMawlek.png");
   frameRate(60);
   
-   //file = new SoundFile(this, "music.mp3");
-   //file.play();
+   
   
    Bug1s = new ArrayList < Bug1 > ();
    Bug1s.add(new Bug1(10));
    
    interval = 3000;
+   
+  //for bestiary
+  mushroom = new Mushroom();
+  knight = new knight();
+ 
+   music = new SoundFile(this, "Stage.mp3");
+   music.loop();
+
+  
   
 }
 
@@ -48,7 +68,9 @@ void draw()
    
    mainmenu();
    lvlSelect();
+   bestiary();
    stage();
+   gameover();
    
 
 
@@ -58,7 +80,7 @@ void draw()
 void mainmenu()
 {
   if (mainMenu){
-    
+  
     background(0);
     push();
     fill(255);
@@ -77,8 +99,8 @@ void mainmenu()
     pop();
     
     push();
-    textSize(28);
-    text("Bestiery", 20, 400);
+    textSize(30);
+    text("Bestiary", 20, 400);
     pop();
     
     push();
@@ -90,19 +112,19 @@ void mainmenu()
     image(img, 600, 300);
     pop();
     
-     if (mousePressed && 285<mouseY && mouseY<305 && 15<mouseX && mouseX<185) {
+     if (mousePressed && 285<mouseY && mouseY<305 && 15<mouseX && mouseX<200) {
         
         movetolvl=true;
         mainMenu = false;
     }
     
-     if (mousePressed && 385<mouseY && mouseY<405 && 15<mouseX && mouseX<185) {
+     if (mousePressed && 385<mouseY && mouseY<405 && 15<mouseX && mouseX<200) {
         
         bestiary=true;
         mainMenu = false;
     }
     
-     if (mousePressed && 485<mouseY && mouseY<505 && 15<mouseX && mouseX<185) {
+     if (mousePressed && 485<mouseY && mouseY<505 && 15<mouseX && mouseX<200) {
         
        exit(); 
     }
@@ -124,7 +146,7 @@ void lvlSelect()
     pop();
     
     push();
-    textSize(28);
+    textSize(30);
     text("Stage 2", 550, 400);
     pop();
     
@@ -141,27 +163,42 @@ void lvlSelect()
 
     
     
-     if (mousePressed && 285<mouseY && mouseY<305 && 550<mouseX && mouseX<620 ) {
+     if (mousePressed && 285<mouseY && mouseY<305 && 550<mouseX && mouseX<700 ) {
         
         movetolvl=false;
         stageLVL = 1;
+        score = 0;
+        gametimer = 60;
+        countUp = 0;
+        timerStart = millis() / 1000;
         stageload = true;
+        
     }
     
-     if (mousePressed && 385<mouseY && mouseY<405 && 550<mouseX && mouseX<620) {
+     if (mousePressed && 385<mouseY && mouseY<405 && 550<mouseX && mouseX<700) {
         
         movetolvl=false;
         stageLVL = 2;
+        score = 0;
+        countUp = 0;
+        gametimer = 45;
+        timerStart = millis() / 1000;
         stageload = true;
+        
     }
     
-     if (mousePressed && 485<mouseY && mouseY<505 && 550<mouseX && mouseX<620) {
+     if (mousePressed && 485<mouseY && mouseY<505 && 550<mouseX && mouseX<700) {
         
         movetolvl=false;
         stageLVL = 3;
+        score = 0;
+        countUp = 0;
+        gametimer = 30;
+        timerStart = millis() / 1000;
         stageload = true;
+        
     }
-      if (mousePressed && 585<mouseY && mouseY<605 && 550<mouseX && mouseX<620) {
+      if (mousePressed && 585<mouseY && mouseY<605 && 550<mouseX && mouseX<700) {
         
         movetolvl=false;
         mainMenu =true;
@@ -172,25 +209,32 @@ void lvlSelect()
 
 void stage()
 {
-  
+    
     if(stageload)
     { 
+   
+      
+      
       
       if(stageLVL ==1)
       {
         c1r = 100;
-        score = 0;
+        
       }
       if(stageLVL ==2)
       {
         c1r = 50;
-        score = 0;
+    
       }
        if(stageLVL ==3)
       {
         c1r = 25;
-        score = 0;
       }
+      
+        
+        
+        
+      
       
         c1x = mouseX;
         c1y = mouseY;
@@ -198,9 +242,9 @@ void stage()
         
         
          //timer to add the bug to the arraylist
-        if (millis() - timer >= interval) {
+        if (millis() - spawntimer >= interval) {
             Bug1s.add(new Bug1(bug1R));
-            timer = millis();
+            spawntimer = millis();
         }
         
         //FlashLight Edit this later
@@ -231,6 +275,7 @@ void stage()
             {
               Bug1s.remove(i);
               score +=1;
+              beastScore +=1;
             }
             
           }
@@ -240,11 +285,21 @@ void stage()
           
           }
             
-            
-            popMatrix();
-        
-      }
-    
+       if(key == 'r')
+       {
+         if(music.isPlaying())
+         {
+           music.pause();
+         }
+         else
+         {
+           music.loop();
+         }
+
+       }
+  
+        countUp = int(millis()/ 1000 - timerStart);
+        timeRem = int (gametimer - countUp);
     
         //diplaying score
         pushMatrix();
@@ -252,8 +307,40 @@ void stage()
         textSize(32);
         text(score, 1200, 600);
         popMatrix();
+        
+       
+            popMatrix();
+        
+      }
+    
+       
+        push();
+        fill(255);
+        textSize(14);
+        text("Timer: " + timeRem, 22, 40);
+        pop();
+        
+        if(timeRem <=0)
+        {
+          stageload = false;
+          gameover =true;
+          gameover();
+          
+        }
+        
+        
+     
+        
+    push();
+    textSize(25);
+    text("R:turn off Music", 22, 700);
+    pop();
+       
+  
      
      }
+     
+   
 }
 
 boolean circleCircle(float c1x, float c1y, float c1r, float c2x, float c2y, float c2r) {
@@ -270,4 +357,149 @@ boolean circleCircle(float c1x, float c1y, float c1r, float c2x, float c2y, floa
     return true;
   }
   return false;
+}
+
+void bestiary()
+{
+  
+  if(bestiary)
+  {
+    
+    if(beastBG ==false){
+    background(0);
+    }
+    
+    push();
+    textSize(30);
+    text("Hollow Knight", 1000, 300);
+    pop();
+    
+    if(beastScore<1)
+    { 
+    push();
+    textSize(30);
+    text("?????", 1000, 400);
+    pop();
+    }
+    else
+    {
+    push();
+    textSize(30);
+    text("Mushroom", 1000, 400);
+    pop();
+    }
+ 
+ 
+    if(beastScore<5)
+    { 
+    push();
+    textSize(30);
+    text("?????", 1000, 500);
+    pop();
+    }
+    else
+    {
+    push();
+    textSize(30);
+    text("Brooding Mawlek", 1000, 500);
+    pop();
+    }
+    
+    push();
+    textSize(30);
+    text("Back", 1000, 700);
+    pop();
+    
+
+    
+    
+      if (mousePressed && 285<mouseY && mouseY<315 && 950<mouseX && mouseX<1200 ) {
+        tearsImg = loadImage("Tears.png");
+        tearsImg.resize(1280, 720);
+        background(tearsImg);
+        beastBG =true;
+        textSize(14); 
+        push();
+        text("The Knight is a resident of the City of Tears.\nHe acts as the guardian of the city, \ndefending those who are in need. \nThe knight weilds a weapon called a nail, \nand paired along side his cloak, the \nknight is a fierce foe.", 30, 300);
+
+        knight.display();
+        pop();
+        
+      }
+    
+      if (mousePressed && 385<mouseY && mouseY<415 &&950<mouseX && mouseX<1200 && beastScore >=1) {
+        mushroomsImg = loadImage("Fungals.jpg");
+        mushroomsImg.resize(1280, 720);
+        background(mushroomsImg);
+        beastBG=true;
+        textSize(14); 
+        push();
+        text("The Mushroom soldier of one of the varying \nfungi residents that exist in this area. \nThey are responsible for repopulation \nof areas in the Fungal Wastes.  ",30, 300);  
+        mushroom.display();
+        pop();
+       
+      }
+      
+      if (mousePressed && 485<mouseY && mouseY<515 &&950<mouseX && mouseX<1200 && beastScore >=2) {
+        spiderImg = loadImage("spiderDen.jpg");
+        spiderImg.resize(1280, 720);
+        background(spiderImg);
+        beastBG=true;
+        textSize(14); 
+        push();
+        text("Ferocious but extremely social creature.\nBecomes aggressive if not able to mingle with its own kind.  ",30, 300);  
+        image(img, 500, 300);
+        pop();
+       
+      }
+    
+    
+      if (mousePressed && 685<mouseY && mouseY<705 && 950<mouseX && mouseX<1200) {
+        
+        bestiary=false;
+        mainMenu =true;
+        beastBG=false;
+    }
+    
+    
+  }
+  
+  
+  
+}
+
+void gameover() {
+  
+  if(gameover)
+  {
+    //make black screen 
+    pushMatrix();
+    fill(0);
+    rect(0, 0, 1280, 720);
+    popMatrix();
+
+    pushMatrix();
+    fill(255);
+    textSize(42);
+    text("GAME OVER", width / 2 - 150, height / 2);
+    scoreText = "Score=" + score;
+    text(scoreText, width / 2 - 150, height / 2 + 50);
+    text("Press v to save picture", width / 2 - 150, height / 2 + 100);
+    text("Press b to view beastiary", width / 2 - 150, height / 2 + 200);
+    
+     if(key == 'v')
+       {
+         save("Score.jpg");
+
+       }
+    if(key == 'b')
+       {
+         bestiary =true;  
+         gameover=false;
+       
+
+       }
+    popMatrix();
+  }
+
 }
