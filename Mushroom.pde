@@ -1,7 +1,7 @@
-class Mushroom
+class Mushroom extends Model
 {
   
-  void mushroomHead() {
+  void head() {
   translate(550, 190);
   fill(0, 85, 125);
   strokeWeight(2);
@@ -35,12 +35,12 @@ class Mushroom
   vertex(119, 26);
   endShape(LINE);
 }
-  void mushroomEyes() {
+  void eyes() {
   fill(0);
   ellipse(117, 128, 6, 3);
   ellipse(135, 129, 6, 3);
 }
-void mushroomBody() {
+void body() {
   fill(193, 185, 169);
   strokeWeight(2);
   beginShape();
@@ -202,9 +202,9 @@ void mushroomPolen(){
 }
 
   void display(){
-    mushroomHead();
-    mushroomBody();
-    mushroomEyes();
+    head();
+    body();
+    eyes();
     mushroomFeatures();
     mushroomSpores();    
     mushroomPolen();    

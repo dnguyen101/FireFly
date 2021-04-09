@@ -1,6 +1,6 @@
 class knight
 {
-  void knightHead() {
+  void head() {
   stroke(5);
   fill(255);
   translate(500, 160);
@@ -93,12 +93,12 @@ class knight
   vertex(99, 14);
   endShape(LINE);
 }
-  void knightEyes() {
+  void eyes() {
   fill(0);
   circle(100, 200, 40);
   circle(175, 200, 40);
 }
-  void knightBody() {  
+  void body() {  
   fill(0);
   beginShape();
   vertex(120, 248);
@@ -140,8 +140,8 @@ class knight
 }
   void display()
   {
-     knightHead();
-    knightEyes(); 
-    knightBody();
+    head();
+    eyes(); 
+    body();
   }
 }

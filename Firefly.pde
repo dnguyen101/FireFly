@@ -17,7 +17,7 @@ String scoreText;
 
 //For beastiary
 PImage tearsImg, mushroomsImg, spiderImg;
-int beastScore;
+int beastScore; //hidden score used to unlock lore
 boolean beastBG = false;
 Mushroom mushroom;
 knight knight;
@@ -36,6 +36,8 @@ float c1r = 0;     // radius
 float bug1R = 10;
 
 ArrayList < Bug1 > Bug1s;
+ArrayList < Bug2 > Bug2s;
+ArrayList < Bug3 > Bug3s;
 
 void setup()
 {
@@ -46,18 +48,23 @@ void setup()
   frameRate(60);
   
    
-  
+  //intializing bugs
    Bug1s = new ArrayList < Bug1 > ();
    Bug1s.add(new Bug1(10));
+   Bug2s = new ArrayList < Bug2 > ();
+   Bug2s.add(new Bug2());
+   Bug3s = new ArrayList < Bug3 > ();
+   Bug3s.add(new Bug3());
    
    interval = 3000;
    
   //for bestiary
+  //intializing models
   mushroom = new Mushroom();
   knight = new knight();
  
    music = new SoundFile(this, "Stage.mp3");
-   music.loop();
+  music.loop();
 
   
   
@@ -233,8 +240,7 @@ void stage()
       
         
         
-        
-      
+ 
       
         c1x = mouseX;
         c1y = mouseY;
@@ -244,6 +250,8 @@ void stage()
          //timer to add the bug to the arraylist
         if (millis() - spawntimer >= interval) {
             Bug1s.add(new Bug1(bug1R));
+            Bug2s.add(new Bug2());
+            Bug3s.add(new Bug3());
             spawntimer = millis();
         }
         
@@ -256,22 +264,24 @@ void stage()
            //display bugs on screen
         for (int i = Bug1s.size() - 1; i >= 0; i--) {
             Bug1 Bug1 = Bug1s.get(i);
+            
             pushMatrix();
             
             //Bug will display as Black
             Bug1.display();
             Bug1.move();
-         
-            
+      
             
           // check for collision
           // if hit, change color
-          boolean hit = circleCircle(c1x,c1y,c1r, Bug1.xPos, Bug1.yPos, Bug1.w);
+          boolean hit1 = circleCircle(c1x,c1y,c1r, Bug1.xPos, Bug1.yPos, Bug1.w);
+  
           
-          if (hit) {
+          
+          if (hit1) {
             Bug1.changeColor();
           
-            if(mousePressed && hit == true)
+            if(mousePressed && hit1 == true)
             {
               Bug1s.remove(i);
               score +=1;
@@ -284,8 +294,79 @@ void stage()
             Bug1.changeBack();
           
           }
+          popMatrix();
+        }
+          
+  
+             //display bug2 on screen
+        for (int i = Bug2s.size() - 1; i >= 0; i--) {
+        
+            Bug2 Bug2 = Bug2s.get(i);
+           
+            pushMatrix();
             
-       if(key == 'r')
+            //Bug will display as Black
+         
+            Bug2.display();
+            Bug2.move();
+            
+           
+            
+          // check for collision
+          // if hit, change color
+          boolean hit2 = circleCircle(c1x,c1y,c1r, Bug2.xPos, Bug2.yPos, Bug2.r);
+      
+          
+          if (hit2) {
+            Bug2.changeColor();
+          
+            if(mousePressed && hit2 == true)
+            {
+              Bug2s.remove(i);
+              score = score +2;
+              beastScore +=1;
+            }
+            
+          }
+          else {
+            //bug will return to black
+            Bug2.changeBack();
+         
+            
+          }
+          popMatrix();
+        }
+        
+      
+      
+          //display bug3 on screen
+        for (int i = Bug3s.size() - 1; i >= 0; i--) {
+      
+            Bug3 Bug3 = Bug3s.get(i);
+            pushMatrix();
+            
+            //Bug will display as Black
+            Bug3.display();
+            Bug3.move();
+            
+          // check for collision
+          // if hit, change color
+          boolean hit3 = circleCircle(c1x,c1y,c1r, Bug3.xPos, Bug3.yPos, Bug3.r);
+          
+          if (hit3) {
+            if(mousePressed && hit3 == true)
+            {
+              Bug3s.remove(i);
+              score= score+3;
+              beastScore +=1;
+            }
+            
+          }
+            popMatrix();
+        }
+    
+    
+     if(key == 'r')
        {
          if(music.isPlaying())
          {
@@ -297,21 +378,17 @@ void stage()
          }
 
        }
-  
-        countUp = int(millis()/ 1000 - timerStart);
+    
+      countUp = int(millis()/ 1000 - timerStart);
         timeRem = int (gametimer - countUp);
     
-        //diplaying score
+    
+    //diplaying score
         pushMatrix();
         fill(255);
         textSize(32);
         text(score, 1200, 600);
         popMatrix();
-        
-       
-            popMatrix();
-        
-      }
     
        
         push();
@@ -332,13 +409,14 @@ void stage()
      
         
     push();
-    textSize(25);
+    textSize(14);
     text("R:turn off Music", 22, 700);
     pop();
        
   
      
      }
+
      
    
 }
@@ -374,6 +452,7 @@ void bestiary()
     text("Hollow Knight", 1000, 300);
     pop();
     
+    //lore is locked behind beastScore
     if(beastScore<1)
     { 
     push();

@@ -1,10 +1,10 @@
-class Bug1 {
+class Bug1 extends Bug {
 
     float xPos = random(width);
     float yPos = 0;
-    float speedY = .1;
-    float gravity = 0.1;
-    float w = 50;
+    float speedY = .001;
+    float gravity = 0.01;
+    float w;
     
     int c = 0;
 
@@ -37,6 +37,15 @@ class Bug1 {
         fill(c);
 
         ellipse(xPos, yPos, w * 2, w * 2);
+        
+        //trail
+        pushMatrix();
+        stroke(0);
+        line(xPos, yPos, xPos-10,yPos-10);
+        noStroke();
+        popMatrix();
+        
+        
     }
     
     void changeColor(){
