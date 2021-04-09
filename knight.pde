@@ -1,4 +1,4 @@
-class knight
+class knight extends Model
 {
   void head() {
   stroke(5);
